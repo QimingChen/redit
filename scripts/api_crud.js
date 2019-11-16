@@ -1,8 +1,8 @@
 import createPostItem from './post.js';
 import createComment from './comment';
 
-export const createPost = (title, body) => {
-    fetch('http://localhost:8080/redit-api/post', {
+export const createPost = (title, description) => {
+    fetch('http://localhost:8080/post', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ export const createPost = (title, body) => {
         },
         body: JSON.stringify({
             title,
-            body
+            description
         }),
     })
         .then(response => response.json())
@@ -22,7 +22,7 @@ export const createPost = (title, body) => {
                 error.innerHTML = response.httpStatus === "BAD_REQUEST" ? "Title may not be blank" : response.httpStatus;
                 document.querySelector('.post-content').append(error);
             } else {
-                const post = createPostItem(response.title, response.body, response.postId, response.author.username);
+                const post = createPostItem(response.title, response.description, response.postId, response.user.username);
                 document.querySelector('.homepage').append(post);
                 document.querySelector('.create-post').style.visibility = 'hidden';
             }
@@ -31,7 +31,7 @@ export const createPost = (title, body) => {
 };
 
 export const deletePost = (postId) => {
-  fetch(`http://localhost:8080/redit-api/post/${postId}`, {
+  fetch(`http://localhost:8080/post/${postId}`, {
       method: 'DELETE',
       headers: {
           'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export const deletePost = (postId) => {
 };
 
 export const fetchPosts = () => {
-  fetch('http://localhost:8080/redit-api/post/list', {
+  fetch('http://localhost:8080/post/list', {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json'
@@ -65,7 +65,7 @@ export const fetchPosts = () => {
 
 //Add this
 export const fetchComments = (post, postId) => {
-  fetch(`http://localhost:8080/redit-api/post/${postId}/comment`, {
+  fetch(`http://localhost:8080/post/${postId}/comment`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json'
@@ -91,7 +91,7 @@ export const fetchComments = (post, postId) => {
 };
 //called in post.js
 export const postComment = (text, postId) => {
-  fetch(`http://localhost:8080/redit-api/post/${postId}/comment`, {
+  fetch(`http://localhost:8080/comment/${postId}`, {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ export const postComment = (text, postId) => {
       .then(response => response.json())
       .then(response => {
           const commentList = document.querySelector('.comment-list');
-          const commented = createComment(response.text, response.commentId, response.author.username, localStorage.getItem('username'));
+          const commented = createComment(response.text, response.commentId, response.user.username, localStorage.getItem('username'));
           commentList.append(commented);
       })
       .catch(err => console.log(err));
@@ -113,7 +113,7 @@ export const postComment = (text, postId) => {
 
 //Edit this
 export const fetchPostbyId = (hash) => {
-    fetch('http://localhost:8080/redit-api/post/list', {
+    fetch('http://localhost:8080/post/list', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -123,7 +123,7 @@ export const fetchPostbyId = (hash) => {
         .then(response => {
             const postId = parseInt(hash.split('/')[1]);
             const postResponse = response.filter(el => el.postId === postId)[0];
-            const post = createPostItem(postResponse.title, postResponse.body, postResponse.postId, postResponse.author.username);
+            const post = createPostItem(postResponse.title, postResponse.description, postResponse.postId, postResponse.user.username);
             post.onmouseenter = () => {
                 post.style.width = '500px';
                 post.style.border = 'none';
@@ -161,7 +161,7 @@ export const fetchPostbyId = (hash) => {
 };
 
 export const deleteComment = (commentId, comment) => {
-    fetch(`http://localhost:8080/redit-api/comment/${commentId}`, {
+    fetch(`http://localhost:8080/comment/${commentId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
