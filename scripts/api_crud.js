@@ -55,7 +55,7 @@ export const fetchPosts = () => {
       .then(response => response.json())
       .then(response => {
         response.forEach(element => {
-            const post = createPostItem(element.title, element.body, element.postId, element.author.username);
+            const post = createPostItem(element.title, element.description, element.postId, element.user.username);
             document.querySelector('.homepage').append(post);
         });
     })
@@ -80,7 +80,7 @@ export const fetchComments = (post, postId) => {
        }
 
         for (let i = 0; i < response.length; i++) {
-          const comment = createComment(response[i].text, response[i].commentId, response[i].author.username, localStorage.getItem('username'));
+          const comment = createComment(response[i].text, response[i].id, response[i].user.username, localStorage.getItem('username'));
           commentList.append(comment);
         }
 
@@ -104,7 +104,7 @@ export const postComment = (text, postId) => {
       .then(response => response.json())
       .then(response => {
           const commentList = document.querySelector('.comment-list');
-          const commented = createComment(response.text, response.commentId, response.user.username, localStorage.getItem('username'));
+          const commented = createComment(response.text, response.id, response.user.username, localStorage.getItem('username'));
           commentList.append(commented);
       })
       .catch(err => console.log(err));
